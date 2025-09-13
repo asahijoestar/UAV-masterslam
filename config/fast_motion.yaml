@@ -1,0 +1,59 @@
+use_calib: false
+single_thread: true        # 描画待ちなどのオーバーヘッドを抑える
+
+dataset:
+  subsample: 1             # 速い動きでは“間引かない”のが基本（=追従重視）
+  img_downsample: 2        # 入力SCALE=0.5 と合わせて軽量化
+  center_principle_point: true
+
+matching:
+  max_iter: 6              # 10→6（速く）
+  radius: 4                # 3→4（対応探索を広めに）
+  dilation_max: 5
+  dist_thresh: 0.15        # 0.1→0.15（外れ値判定を少し緩める）
+  convergence_thresh: 1e-6
+  lambda_init: 1e-8
+
+tracking:
+  max_iters: 25            # 50→25（1フレーム当たりを短縮）
+  min_match_frac: 0.04     # 0.05→0.04（最低マッチ率をやや緩める）
+  match_frac_thresh: 0.25  # 0.333→0.25（KF挿入の閾値を下げやすく）
+  C_conf: 0.0
+  Q_conf: 1.5
+  rel_error: 0.002         # 0.001→0.002（収束条件を緩める）
+  delta_norm: 0.002        # 0.001→0.002
+  huber: 1.345
+  sigma_ray: 0.003
+  sigma_dist: 10.0
+  sigma_pixel: 1.2         # 1.0→1.2（ブラー対策で画素ノイズ許容↑）
+  sigma_depth: 10.0
+  sigma_point: 0.05
+  pixel_border: -10
+  depth_eps: 1e-6
+  filtering_mode: weighted_pointmap
+  filtering_score: median
+
+local_opt:
+  pin: 1
+  window_size: 200.0       # 1e6→200（近傍だけ最適化＝速い）
+  max_iters: 5             # 10→5
+  C_conf: 0.0
+  Q_conf: 1.5
+  min_match_frac: 0.08
+  pixel_border: -10
+  depth_eps: 1e-6
+  sigma_ray: 0.003
+  sigma_dist: 10.0
+  sigma_pixel: 1.2
+  sigma_depth: 10.0
+  sigma_point: 0.05
+  delta_norm: 1e-8
+  use_cuda: true
+
+retrieval:
+  k: 2                     # 速い動きで見失いやすい → 1よりやや厚め
+  min_thresh: 0.008        # 0.005→0.008（弱すぎる対応は採らない）
+
+reloc:
+  min_match_frac: 0.25     # 0.3→0.25（再ローカライズを通しやすく）
+  strict: false
